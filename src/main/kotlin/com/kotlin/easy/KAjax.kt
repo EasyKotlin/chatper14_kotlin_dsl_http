@@ -13,16 +13,16 @@ import java.util.concurrent.TimeUnit
  * Created by jack on 2017/7/23.
  */
 
-fun http(init: RequestWrapper.() -> Unit) {
-    val wrap = RequestWrapper()
+fun ajax(init: HttpRequestWrapper.() -> Unit) {
+    val wrap = HttpRequestWrapper()
     wrap.init()
-    ajax(wrap)
+    doCall(wrap)
 }
 
 /**
  * 执行请求，并把返回通过 RxKotlin 的接口赋值给
  */
-private fun ajax(wrap: RequestWrapper) {
+private fun doCall(wrap: HttpRequestWrapper) {
     // 数据发射源
     val sender = Observable.create<Response>({
         e ->
@@ -51,7 +51,7 @@ private fun ajax(wrap: RequestWrapper) {
 }
 
 
-private fun call(wrap: RequestWrapper): Response {
+private fun call(wrap: HttpRequestWrapper): Response {
 
     var req: Request? = null
     when (wrap.method?.toLowerCase()) {
@@ -67,7 +67,7 @@ private fun call(wrap: RequestWrapper): Response {
     return resp
 }
 
-class RequestWrapper {
+class HttpRequestWrapper {
 
     var url: String? = null
 
