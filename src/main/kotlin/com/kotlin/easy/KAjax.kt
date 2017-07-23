@@ -15,7 +15,9 @@ import java.util.concurrent.TimeUnit
 
 fun ajax(init: HttpRequestWrapper.() -> Unit) {
     val wrap = HttpRequestWrapper()
-    wrap.init()
+    println("init = ${init}") // init = Function1<com.kotlin.easy.HttpRequestWrapper, kotlin.Unit>
+    // wrap.init()
+    init.invoke(wrap)
     doCall(wrap)
 }
 
@@ -50,23 +52,28 @@ private fun doCall(wrap: HttpRequestWrapper) {
     sender.subscribe(receiver)
 }
 
-
+/**
+ * http 执行引擎
+ */
 private fun call(wrap: HttpRequestWrapper): Response {
 
     var req: Request? = null
     when (wrap.method?.toLowerCase()) {
-
         "get" -> req = Request.Builder().url(wrap.url).build()
         "post" -> req = Request.Builder().url(wrap.url).post(wrap.body).build()
         "put" -> req = Request.Builder().url(wrap.url).put(wrap.body).build()
         "delete" -> req = Request.Builder().url(wrap.url).delete(wrap.body).build()
     }
 
-    val http = OkHttpClient.Builder().connectTimeout(wrap.timeout, TimeUnit.SECONDS).build()
+    val http = OkHttpClient.Builder().connectTimeout(wrap.timeout, TimeUnit.MILLISECONDS).build()
     val resp = http.newCall(req).execute()
     return resp
 }
 
+
+/**
+ * Http请求对象封装类
+ */
 class HttpRequestWrapper {
 
     var url: String? = null
@@ -75,7 +82,7 @@ class HttpRequestWrapper {
 
     var body: RequestBody? = null
 
-    var timeout: Long = 10
+    var timeout: Long = 10000
 
     internal var success: (String) -> Unit = {}
     internal var fail: (Throwable) -> Unit = {}

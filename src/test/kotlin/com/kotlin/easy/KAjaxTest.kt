@@ -17,7 +17,6 @@ class KAjaxTest {
 
     @Test fun testHttpOnSuccess() {
         val testUrl = "https://www.baidu.com"
-
         ajax {
             url = testUrl
             method = "get"
@@ -31,6 +30,7 @@ class KAjaxTest {
                 println(e.message)
             }
         }
+
     }
 
     @Test fun testHttpOnError() {
@@ -70,5 +70,25 @@ class KAjaxTest {
                 println(e.message)
             }
         }
+    }
+
+
+    @Test fun testLambda() {
+        val testUrl = "https://www.baidu.com"
+
+        val init: HttpRequestWrapper.() -> Unit = {
+            this.url = testUrl
+            this.method = "get"
+            this.success {
+                string ->
+                println(string)
+                Assert.assertTrue(string.contains("百度一下"))
+            }
+            this.error {
+                e ->
+                println(e.message)
+            }
+        }
+        ajax(init)
     }
 }
